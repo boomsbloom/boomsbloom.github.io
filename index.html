@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Jonathan Nicholas</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <script type="text/javascript" src="js/paper-full.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
     <script type="text/paperscript" canvas="canvas">
 
       //background color
@@ -23,7 +25,7 @@
       rect2.fillColor = '#77B4C7' // 89CBE0
 
     // amount of segment points:
-    var amount = 40
+    var amount = 30//40
 
     // maximum height of wave:
     var height = 20
@@ -47,6 +49,34 @@
       p3.add(new Point(i / amount, 1) * view.size)
     }
 
+    function onHover(path) {
+      path.onMouseEnter = function(e) {
+        if (path == p1) {
+          //"Brain" icon by Gracelle Mesina from the Noun Project
+          cursor = "url('images/brain.svg'), pointer"
+        } else if (path == p2) {
+          //"code" icon by iconsphere from the Noun Project
+          cursor = "url(images/code.svg), pointer"
+        } else if (path == p3) {
+          //"boy" icon by Erik Kazuo Takara from the Noun Project
+          cursor = "url(images/about.svg), pointer"
+        } else {
+          cursor = 'pointer'
+        }
+        document.body.style.cursor = cursor
+      }
+      path.onMouseLeave = function(e) {
+        document.body.style.cursor = "default"
+      }
+    }
+
+    onHover(p1)
+    onHover(p2)
+    onHover(p3)
+
+    p1_y = 180
+    p2_y = 220
+    p3_y = 260
     function onFrame(event) {
 
     	for (var i = 0; i <= amount; i++) {
@@ -57,15 +87,72 @@
     		// A cylic value between -1 and 1
     		var sinus = Math.sin(event.time * 3 + i)
 
-    		segment.point.y = sinus * height + 180
-    		segment2.point.y = sinus * height + 220
-        segment3.point.y = sinus * height + 260
+    		segment.point.y = sinus * height + p1_y
+    		segment2.point.y = sinus * height + p2_y
+        segment3.point.y = sinus * height + p3_y
 
     	}
     	p1.smooth()
     	p2.smooth()
       p3.smooth()
     }
+
+    function mkText(path) {
+      if (path == p1) {
+        textVal = "Neuroscience Stuff"
+      } else if (path == p2) {
+        textVal = "Code or Art Stuff"
+      } else {
+        textVal = "I graduated from Brown in 2015 with Honors in Cognitive Neuroscience and \ncurrently work in the Stanford Cognitive and Systems Neuroscience Lab. My\nwork utilizes graph theoretic techniques, signal processing methods, machine\nlearning, web app development, and plenty of data wrangling. I code in\nPython, Javascript, and Matlab. I like to build things <github> and read stuff\n <goodreads> and watch stuff <imdb> and listen to stuff <soundcloud>."
+      }
+      var text = new PointText({
+        point: [view.size.width/8+10, 400],
+        content: textVal,
+        fillColor: 'white',
+        fontFamily: 'Futura',
+        fontWeight: 'normal',
+        fontSize: 30
+      })
+      return text
+    }
+
+    function pgChange(path, color, y) {
+      path.onMouseDown = function(e) {
+        if (typeof(currText) != 'undefined') {
+          currText.remove()
+        }
+        if (newR) {
+          newR.remove()
+        }
+        var newR = new Path.Rectangle({
+            point: [0, y],
+            size: [view.size.width, view.size.height],
+        })
+        newR.fillColor = color // 89CBE0
+        newR.insertBelow(p3)
+        newR.insertBelow(p2)
+        newR.insertBelow(p1)
+        currText = mkText(path)
+        if (path == p2) { //try to factor this out later...
+          p1_y = 220
+          p2_y = 260
+          p3_y = 180
+        } else if (path == p3) {
+          p1_y = 180
+          p2_y = 220
+          p3_y = 260
+        } else {
+          p1_y = 260
+          p2_y = 180
+          p3_y = 220
+        }
+        return newR
+      }
+    }
+
+    r1 = pgChange(p1, '#FFDEBA', p1_y)
+    r2 = pgChange(p2, '#FFBA9E', p2_y)
+    r3 = pgChange(p3, '#D4A998', p3_y)
 
     var title = new PointText({
       point: [view.size.width/8-30, 80],
@@ -76,15 +163,8 @@
       fontSize: 50
     })
 
-    var text = new PointText({
-      point: [view.size.width/8+10, 400],
-      content:
-        "I graduated from Brown in 2015 with Honors in Cognitive Neuroscience and \ncurrently work in the Stanford Cognitive and Systems Neuroscience Lab. My\nwork utilizes graph theoretic techniques, signal processing methods, machine\nlearning, web app development, and plenty of data wrangling. I code in\nPython, Javascript, and Matlab. I like to build things <github> and read stuff\n <goodreads> and watch stuff <imdb> and listen to stuff <soundcloud>.",
-      fillColor: 'white',
-      fontFamily: 'Futura',
-      fontWeight: 'normal',
-      fontSize: 30
-    })
+
+    currText = mkText(p3)
 
     </script>
 
