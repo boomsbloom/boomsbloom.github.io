@@ -116,10 +116,27 @@
       return text
     }
 
+    function mkImage(imgName) {
+      var raster = new Raster(imgName);
+      if (imgName == 'coding') {
+        raster.scale(8)
+      } else {
+        raster.scale(0.5)
+      }
+      raster.position.x = view.size.width/2//# = view.center;
+      raster.position.y = view.size.height/2 + 100
+
+      return raster
+    }
+
     function pgChange(path, color, y) {
       path.onMouseDown = function(e) {
         if (typeof(currText) != 'undefined') {
           currText.remove()
+        }
+        if (typeof(currImg) != 'undefined') {
+          currImg.remove()
+          console.log(currImg)
         }
         if (newR) {
           newR.remove()
@@ -134,6 +151,7 @@
         newR.insertBelow(p1)
         currText = mkText(path)
         if (path == p2) { //try to factor this out later...
+          //currImg = mkImage('coding')
           p1_y = 220
           p2_y = 260
           p3_y = 180
@@ -142,6 +160,7 @@
           p2_y = 220
           p3_y = 260
         } else {
+          currImg = mkImage('neuro')
           p1_y = 260
           p2_y = 180
           p3_y = 220
@@ -172,6 +191,8 @@
 <body>
 
     <canvas id="canvas" resize></canvas>
+    <img id="neuro" class="visuallyhidden" src="images/brain.png" width="320" height="491">
+    <img id="coding" class="visuallyhidden" src="images/code.svg" width="320" height="491">
 
 </body>
 </html>
